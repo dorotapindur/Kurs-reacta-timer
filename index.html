@@ -55,6 +55,7 @@
     </style>
 </head>
 <body>
+    <!--
     <h1>Kurs Reacta - Tydzień 2</h1>
     <hr>
     <div class="App">
@@ -64,24 +65,25 @@
             <button disabled>Zacznij</button>
         </div>
         <div class="Timebox">
-            <h1>Uczę się skrótów klawiszowych</h1>
-            <h2 class="Clock">Pozostało 13:28</h2>
+            <h2>Uczę się skrótów klawiszowych</h2>
+            <p class="Clock">Pozostało 13:28</p>
             <div class="ProgressBar">
                 <div ></div>
             </div>
             <button disabled>Start</button>
             <button>Stop</button>
             <button>Pauzuj</button>
-            Liczba przerw: 2
+            <p>Liczba przerw: 2</p>
         </div>
     </div>
+    -->
 
-    <div id="root"></div>
+    <div id="root" class="App"></div>
 </body>
 <script type="text/javascript">
     const rootElement = document.getElementById("root");
-    const domElement = document.createElement("div");
-    domElement.className = "TimeboxEditor";
+    const timeboxEditor = document.createElement("div");
+    timeboxEditor.className = "TimeboxEditor inactive";
     const labelOne = document.createElement("label");
     labelOne.textContent = "Co robisz";
     const inputOne = document.createElement("input");
@@ -93,13 +95,36 @@
     const inputTwo = document.createElement("input");
     inputTwo.value = "25";
     inputTwo.type="text";
+    const goButton = document.createElement("button");
+    goButton.innerHTML = "Zacznij";
 
-    rootElement.append(domElement);
-    domElement.append(labelOne, lineBreak);
+    rootElement.append(timeboxEditor);
+    timeboxEditor.append(labelOne, lineBreak, labelTwo, goButton);
     labelOne.append(inputOne);
-    domElement.append(labelTwo);
     labelTwo.append(inputTwo);
 
+    const timebox = document.createElement("div");
+    timebox.className = "Timebox";
+    const header = document.createElement("h2");
+    header.textContent = "Uczę się";
+    const clock = document.createElement("p");
+    clock.className = "Clock";
+    clock.textContent = "Pozostało 09:12";
+    const progressBar = document.createElement("div");
+    progressBar.className = "ProgressBar";
+    const inProgress = document.createElement("div");
+    const startButton = document.createElement("button");
+    startButton.innerHTML = "Start";
+    const stopButton = document.createElement("button");
+    stopButton.innerHTML = "Stop";
+    const pauseButton = document.createElement("button");
+    pauseButton.innerHTML = "Pauzuj";
+    const breaks = document.createElement("p");
+    breaks.innerHTML = "Liczba przerw: 2";
+
+    rootElement.append(timebox);
+    timebox.append(header, clock, progressBar, startButton, stopButton, pauseButton, breaks);
+    progressBar.append(inProgress);
 
     /*const element = React.createElement(
         "h2",
