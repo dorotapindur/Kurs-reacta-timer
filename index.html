@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Kurs Reacta - tydzień 1</title>
+    <title>Kurs Reacta - tydzień 2</title>
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         .App {
             font-family: sans-serif;
@@ -43,11 +44,9 @@
             margin-bottom: 20px;
             padding: 5px;
             padding-left: 20%;
-        }
-        .ProgressBar > div {
-            height: 100%;
-            background-color: orangered;
-            width: 100%;
+            position: relative;
+            background: orangered;
+            background-clip: content-box;
         }
         .inactive {
             filter: blur(2px) grayscale(1);
@@ -55,7 +54,6 @@
     </style>
 </head>
 <body>
-    <!--
     <h1>Kurs Reacta - Tydzień 2</h1>
     <hr>
     <div class="App">
@@ -66,73 +64,29 @@
         </div>
         <div class="Timebox">
             <h2>Uczę się skrótów klawiszowych</h2>
-            <p class="Clock">Pozostało 13:28</p>
-            <div class="ProgressBar">
-                <div ></div>
-            </div>
+            <div id="root"></div>
+            <div class="ProgressBar"></div>
             <button disabled>Start</button>
             <button>Stop</button>
             <button>Pauzuj</button>
             <p>Liczba przerw: 2</p>
         </div>
     </div>
-    -->
-
-    <div id="root" class="App"></div>
 </body>
-<script type="text/javascript">
+
+<script type="text/babel">
+
+function Clock({hours = 3, minutes = 7, seconds = 7, miliseconds = 23}) {
+        return <p className="Clock">Pozostało {hours < 24 ?
+         (hours<0 ? hours=`00` : (hours < 10 ? hours=`0${hours}` : hours)) : hours='23'}:{minutes < 60 ?
+         (minutes<0 ? minutes=`00` : (minutes < 10 ? minutes=`0${minutes}` : minutes)) : minutes='59'}:{seconds < 60 ?
+         (seconds<0 ? seconds=`00` : (seconds < 10 ? seconds=`0${seconds}` : seconds)) : seconds='59'}.{miliseconds < 1000 ? (miliseconds >= 100 ? miliseconds : (miliseconds >= 10 ? miliseconds=`0${miliseconds}` : (miliseconds >= 0 ? miliseconds=`00${miliseconds}` : miliseconds='000'))) : miliseconds='999'}</p>
+    }
     const rootElement = document.getElementById("root");
-    const timeboxEditor = document.createElement("div");
-    timeboxEditor.className = "TimeboxEditor inactive";
-    const labelOne = document.createElement("label");
-    labelOne.textContent = "Co robisz";
-    const inputOne = document.createElement("input");
-    inputOne.value = "uczę się";
-    inputOne.type="text";
-    const lineBreak = document.createElement("br");
-    const labelTwo = document.createElement("label");
-    labelTwo.textContent = "Ile minut?";
-    const inputTwo = document.createElement("input");
-    inputTwo.value = "25";
-    inputTwo.type="text";
-    const goButton = document.createElement("button");
-    goButton.innerHTML = "Zacznij";
-
-    rootElement.append(timeboxEditor);
-    timeboxEditor.append(labelOne, lineBreak, labelTwo, goButton);
-    labelOne.append(inputOne);
-    labelTwo.append(inputTwo);
-
-    const timebox = document.createElement("div");
-    timebox.className = "Timebox";
-    const header = document.createElement("h2");
-    header.textContent = "Uczę się";
-    const clock = document.createElement("p");
-    clock.className = "Clock";
-    clock.textContent = "Pozostało 09:12";
-    const progressBar = document.createElement("div");
-    progressBar.className = "ProgressBar";
-    const inProgress = document.createElement("div");
-    const startButton = document.createElement("button");
-    startButton.innerHTML = "Start";
-    const stopButton = document.createElement("button");
-    stopButton.innerHTML = "Stop";
-    const pauseButton = document.createElement("button");
-    pauseButton.innerHTML = "Pauzuj";
-    const breaks = document.createElement("p");
-    breaks.innerHTML = "Liczba przerw: 2";
-
-    rootElement.append(timebox);
-    timebox.append(header, clock, progressBar, startButton, stopButton, pauseButton, breaks);
-    progressBar.append(inProgress);
-
-    /*const element = React.createElement(
-        "h2",
-        { className: "Clock" },
-        "Pozostało 09:21"
-    );
-    console.log(element);
-    ReactDOM.render(element, rootElement);*/
+    
+    const element = (<Clock />);
+    ReactDOM.render(element, rootElement);
 
 </script>
+
 </html>
