@@ -38,16 +38,25 @@
             color: orangered;
         }
         .ProgressBar {
-            border: 5px solid white;
-            box-shadow: 0 0 0 1px orangered;
-            border-radius: 5px;
+            border-radius: 3px;
             height: 25px;
             margin-bottom: 20px;
             padding: 0;
-            background: orangered;
+            background: rgb(255, 68, 0);
             background-clip: content-box;
+            position: relative;
+        }
+        .ProgressBar:before {
+            content: "";
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: calc(100% + 12px);
+            height: calc(100% + 12px);
+            border: 1px solid orangered;
+            border-radius: 5px;
             box-sizing: border-box;
-            width: 100%;
+            z-index: -1;
         }
         .inactive {
             filter: blur(2px) grayscale(1);
@@ -86,6 +95,7 @@ function ProgressBar({className = "", percent = 33, trackRemaining = false}) {
         return (<div className={"ProgressBar " + className} style={{ paddingLeft: `${percent}%` }}></div>)
         else return (<div className={"ProgressBar " + className} style={{ paddingRight: `${percent}%` }}></div>);
 };
+
 class Timebox extends React.Component {
     constructor(props) {
         super(props);
