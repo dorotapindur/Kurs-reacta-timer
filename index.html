@@ -72,32 +72,66 @@ function TimeboxEditor() {
     )
 };
 
-function Clock({hours = 3, minutes = 7, seconds = 7, miliseconds = 23}) {
-        return (<p className="Clock">Pozostało {hours < 24 ?
+function Clock({className = "", hours = 3, minutes = 7, seconds = 7, miliseconds = 23}) {
+        return (<p className={"Clock " + className}>Pozostało {hours < 24 ?
          (hours<0 ? hours=`00` : (hours < 10 ? hours=`0${hours}` : hours)) : hours='23'}:{minutes < 60 ?
          (minutes<0 ? minutes=`00` : (minutes < 10 ? minutes=`0${minutes}` : minutes)) : minutes='59'}:{seconds < 60 ?
          (seconds<0 ? seconds=`00` : (seconds < 10 ? seconds=`0${seconds}` : seconds)) : seconds='59'}.{miliseconds < 1000 ? (miliseconds >= 100 ? miliseconds : (miliseconds >= 10 ? miliseconds=`0${miliseconds}` : (miliseconds >= 0 ? miliseconds=`00${miliseconds}` : miliseconds='000'))) : miliseconds='999'}</p>)
     };
 
-function ProgressBar({percent = 33, trackRemaining = false}) {
+function ProgressBar({className = "", percent = 33, trackRemaining = false}) {
     if (percent > 100) return percent=100;
     if (percent < 0) return percent=0;
     if (trackRemaining)  
-        return (<div className="ProgressBar" style={{ paddingLeft: `${percent}%` }}></div>)
-        else return (<div className="ProgressBar" style={{ paddingRight: `${percent}%` }}></div>);
+        return (<div className={"ProgressBar " + className} style={{ paddingLeft: `${percent}%` }}></div>)
+        else return (<div className={"ProgressBar " + className} style={{ paddingRight: `${percent}%` }}></div>);
 };
 class Timebox extends React.Component {
-
+    constructor(props) {
+        super(props);
+        this.state = {
+            isRunning: true,
+            isPaused: false,
+            pausesCount: 0
+        }
+        this.handleStart = this.handleStart.bind(this);
+        this.handleStop = this.handleStop.bind(this);
+        this.togglePause = this.togglePause.bind(this)
+    }
+    handleStart(event) {
+        this.setState({
+            isRunning: true
+        })
+    }
+    handleStop(event) {
+        this.setState({
+            isRunning: false,
+            isPaused: false,
+            pausesCount: 0
+        })
+    }
+    togglePause() {
+        this.setState(
+            function(prevState) {
+                const isPaused = !prevState.isPaused;
+                return {
+                    isPaused,
+                    pausesCount: isPaused ? prevState.pausesCount + 1 : prevState.pausesCount
+                }
+            }
+        )
+    }
     render() {
+        const {isRunning, isPaused, pausesCount} = this.state;
         return (
             <div className="Timebox">
                 <h2>Uczę się skrótów klawiszowych</h2>
-                <Clock />
-                <ProgressBar />
-                <button disabled>Start</button>
-                <button>Stop</button>
-                <button>Pauzuj</button>
-                <p>Liczba przerw: 2</p>
+                <Clock className={isPaused ? "inactive" : ""}/>
+                <ProgressBar className={isPaused ? "inactive" : ""} />
+                <button onClick={this.handleStart} disabled={isRunning}>Start</button>
+                <button onClick={this.handleStop} disabled={!isRunning}>Stop</button>
+                <button onClick={this.togglePause} disabled={!isRunning}>{isPaused ? "Wznów" : "Pauzuj"}</button>
+                <p>Liczba przerw: {pausesCount}</p>
             </div>
         )
     }
