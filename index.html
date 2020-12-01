@@ -88,42 +88,53 @@ function Clock({className = "", hours = 3, minutes = 7, seconds = 7, miliseconds
          (seconds<0 ? seconds=`00` : (seconds < 10 ? seconds=`0${seconds}` : seconds)) : seconds='59'}.{miliseconds < 1000 ? (miliseconds >= 100 ? miliseconds : (miliseconds >= 10 ? miliseconds=`0${miliseconds}` : (miliseconds >= 0 ? miliseconds=`00${miliseconds}` : miliseconds='000'))) : miliseconds='999'}</p>)
     };
 
-function ProgressBar({className = "", percent = 33, trackRemaining = false}) {
+function ProgressBar({className = "", percent = 0, trackRemaining = false}) {
     if (percent > 100) return percent=100;
     if (percent < 0) return percent=0;
     if (trackRemaining)  
         return (<div className={"ProgressBar " + className} style={{ paddingLeft: `${percent}%` }}></div>)
-        else return (<div className={"ProgressBar " + className} style={{ paddingRight: `${percent}%` }}></div>);
+        else return (<div className={"ProgressBar " + className} style={{ paddingRight: `${100 - percent}%` }}></div>);
 };
 
 class Timebox extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isRunning: true,
+            isRunning: false,
             isPaused: false,
-            pausesCount: 0
+            pausesCount: 0,
+            elapsedTimeInSeconds: 0,
+            totalTimeInSeconds: 10
         }
         this.handleStart = this.handleStart.bind(this);
         this.handleStop = this.handleStop.bind(this);
-        this.togglePause = this.togglePause.bind(this)
+        this.togglePause = this.togglePause.bind(this);
     }
     handleStart(event) {
         this.setState({
             isRunning: true
-        })
+        });
+        this.startTimer();
     }
     handleStop(event) {
         this.setState({
             isRunning: false,
             isPaused: false,
-            pausesCount: 0
-        })
+            pausesCount: 0,
+            elapsedTimeInSeconds: 0
+        });
+        this.stopTimer();
+        
     }
     togglePause() {
         this.setState(
             function(prevState) {
                 const isPaused = !prevState.isPaused;
+                if (isPaused) {
+                    this.stopTimer()
+                } else {
+                    this.startTimer()
+                }
                 return {
                     isPaused,
                     pausesCount: isPaused ? prevState.pausesCount + 1 : prevState.pausesCount
@@ -131,13 +142,29 @@ class Timebox extends React.Component {
             }
         )
     }
+    startTimer() {
+        this.intervalId = window.setInterval (
+            () => {
+                this.setState(
+                    (prevState) => ({elapsedTimeInSeconds: prevState.elapsedTimeInSeconds + 0.1})
+                )
+            },
+            100
+        );
+    }
+    stopTimer() {window.clearInterval(this.intervalId);}
     render() {
-        const {isRunning, isPaused, pausesCount} = this.state;
+        const {isRunning, isPaused, pausesCount, elapsedTimeInSeconds} = this.state;
+        const totalTimeInSeconds = 10;
+        const timeLeftInSeconds = totalTimeInSeconds - elapsedTimeInSeconds;
+        const minutesLeft = Math.floor(timeLeftInSeconds/60);
+        const secondsLeft = Math.floor(timeLeftInSeconds%60);
+        const progressInPercent = (elapsedTimeInSeconds/totalTimeInSeconds) * 100;
         return (
             <div className="Timebox">
                 <h2>Uczę się skrótów klawiszowych</h2>
-                <Clock className={isPaused ? "inactive" : ""}/>
-                <ProgressBar className={isPaused ? "inactive" : ""} />
+                <Clock minutes={minutesLeft} seconds={secondsLeft} className={isPaused ? "inactive" : ""}/>
+                <ProgressBar percent={progressInPercent} className={isPaused ? "inactive" : ""} />
                 <button onClick={this.handleStart} disabled={isRunning}>Start</button>
                 <button onClick={this.handleStop} disabled={!isRunning}>Stop</button>
                 <button onClick={this.togglePause} disabled={!isRunning}>{isPaused ? "Wznów" : "Pauzuj"}</button>
