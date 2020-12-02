@@ -81,11 +81,11 @@ function TimeboxEditor() {
     )
 };
 
-function Clock({className = "", hours = 3, minutes = 7, seconds = 7, miliseconds = 23}) {
+function Clock({className = "", hours = 3, minutes = 7, seconds = 7}) {
         return (<p className={"Clock " + className}>Pozostało {hours < 24 ?
          (hours<0 ? hours=`00` : (hours < 10 ? hours=`0${hours}` : hours)) : hours='23'}:{minutes < 60 ?
          (minutes<0 ? minutes=`00` : (minutes < 10 ? minutes=`0${minutes}` : minutes)) : minutes='59'}:{seconds < 60 ?
-         (seconds<0 ? seconds=`00` : (seconds < 10 ? seconds=`0${seconds}` : seconds)) : seconds='59'}.{miliseconds < 1000 ? (miliseconds >= 100 ? miliseconds : (miliseconds >= 10 ? miliseconds=`0${miliseconds}` : (miliseconds >= 0 ? miliseconds=`00${miliseconds}` : miliseconds='000'))) : miliseconds='999'}</p>)
+         (seconds<0 ? seconds=`00` : (seconds < 10 ? seconds=`0${seconds}` : seconds)) : seconds='59'}</p>)
     };
 
 function ProgressBar({className = "", percent = 0, trackRemaining = false}) {
