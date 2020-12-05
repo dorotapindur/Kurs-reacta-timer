@@ -64,7 +64,7 @@
     </style>
 </head>
 <body>
-    <h1>Kurs Reacta - Tydzień 2</h1>
+    <h1>Kurs Reacta - Tydzień 3</h1>
     <hr>
     <div id="root"></div>
 </body>
@@ -127,7 +127,6 @@ class Timebox extends React.Component {
             isPaused: false,
             pausesCount: 0,
             elapsedTimeInSeconds: 0,
-            totalTime: 5
         }
         this.handleStart = this.handleStart.bind(this);
         this.handleStop = this.handleStop.bind(this);
@@ -185,7 +184,9 @@ class Timebox extends React.Component {
     stopTimer() {window.clearInterval(this.intervalId);}
 
     render() {
-        const {isRunning, isPaused, pausesCount, elapsedTimeInSeconds, totalTime} = this.state;
+        const {isRunning, isPaused, pausesCount, elapsedTimeInSeconds} = this.state;
+        const {title, totalTimeInMinutes} = this.props;
+        const totalTime = totalTimeInMinutes * 60;
         const timeLeftInSeconds = totalTime - elapsedTimeInSeconds;
         const hoursLeft = Math.floor(timeLeftInSeconds/3600);
         const minutesLeft = Math.floor(timeLeftInSeconds/60);
@@ -193,7 +194,7 @@ class Timebox extends React.Component {
         const progressInPercent = (elapsedTimeInSeconds/totalTime) * 100;
         return (
             <div className="Timebox">
-                <h2>Uczę się skrótów klawiszowych</h2>
+                <h2>{title}</h2>
                 <Clock hours={hoursLeft} minutes={minutesLeft} seconds={secondsLeft} className={isPaused ? "inactive" : ""}/>
                 <ProgressBar percent={progressInPercent} className={isPaused ? "inactive" : ""} />
                 <button onClick={this.handleStart} disabled={isRunning}>Start</button>
@@ -205,11 +206,26 @@ class Timebox extends React.Component {
     }
 };
 
+class EditableTimebox extends React.Component {
+    state = {
+        title: "Uczę się wyciągać stan w górę!",
+        totalTimeInMinutes: 20,
+    }
+    render() {
+        const { title, totalTimeInMinutes } = this.state
+        return (
+            <>
+                <TimeboxEditor />
+                <Timebox title={title} totalTimeInMinutes={totalTimeInMinutes} totalTime={totalTimeInMinutes * 60}/>
+            </>
+        )
+    }
+}
+
 function App() {
     return (
         <div className="App">
-            <TimeboxEditor />
-            <Timebox />
+            <EditableTimebox/>
         </div>
     )
 }
