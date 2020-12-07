@@ -36,6 +36,7 @@
         }
         .Clock {
             color: orangered;
+            font-weight: bold;
         }
         .ProgressBar {
             border-radius: 3px;
@@ -71,37 +72,30 @@
 
 <script type="text/babel">
 
-class TimeboxEditor extends React.Component {
-    state = {
-        title: "Uczę się o kontrolowanych komponentach",
-        totalTimeInMinutes: 15,
-    }
-    handleTitleChange = (event) => {
-        this.setState({ title: event.target.value})
-    }
-    handleTotalTimeInMinutesChange = (event) => {
-        this.setState({ totalTimeInMinutes: event.target.value})
-    }
-    render() {
-        const { title, totalTimeInMinutes } = this.state;
-        return (
-            <div className="TimeboxEditor">
-                <label>Co robisz? <input
-                    disabled={false}
-                    value={title}
-                    onChange={this.handleTitleChange}
-                    type="text" />
-                </label><br />
-                <label>Ile minut? <input 
-                    disabled={false}
-                    value={totalTimeInMinutes}
-                    onChange={this.handleTotalTimeInMinutesChange}
-                    type="number" />
-                </label><br />
-                <button disabled={false}>Zacznij</button>
-            </div>
-        )
-    }
+function TimeboxEditor(props) {
+    const { 
+        title, 
+        totalTimeInMinutes,
+        onTitleChange,
+        onTotalTimeInMinutesChange
+    } = props;
+    return (
+        <div className="TimeboxEditor">
+            <label>Co robisz? <input
+                disabled={false}
+                value={title}
+                onChange={onTitleChange}
+                type="text" />
+            </label><br />
+            <label>Ile minut? <input 
+                disabled={false}
+                value={totalTimeInMinutes}
+                onChange={onTotalTimeInMinutesChange}
+                type="number" />
+            </label><br />
+            <button disabled={false}>Zacznij</button>
+        </div>
+    )
 };
 
 function Clock({className = "", hours = 3, minutes = 7, seconds = 7}) {
@@ -171,7 +165,7 @@ class Timebox extends React.Component {
                 this.setState(
                     (prevState) => ({elapsedTimeInSeconds: prevState.elapsedTimeInSeconds + 0.01})
                 )
-                if (this.state.elapsedTimeInSeconds > this.state.totalTime) {
+                if (this.state.elapsedTimeInSeconds > this.props.totalTime) {
                     this.stopTimer();
                     this.setState({
                         isRunning: false,
@@ -185,8 +179,7 @@ class Timebox extends React.Component {
 
     render() {
         const {isRunning, isPaused, pausesCount, elapsedTimeInSeconds} = this.state;
-        const {title, totalTimeInMinutes} = this.props;
-        const totalTime = totalTimeInMinutes * 60;
+        const {title, totalTimeInMinutes, totalTime} = this.props;
         const timeLeftInSeconds = totalTime - elapsedTimeInSeconds;
         const hoursLeft = Math.floor(timeLeftInSeconds/3600);
         const minutesLeft = Math.floor(timeLeftInSeconds/60);
@@ -196,11 +189,13 @@ class Timebox extends React.Component {
             <div className="Timebox">
                 <h2>{title}</h2>
                 <Clock hours={hoursLeft} minutes={minutesLeft} seconds={secondsLeft} className={isPaused ? "inactive" : ""}/>
-                <ProgressBar percent={progressInPercent} className={isPaused ? "inactive" : ""} />
-                <button onClick={this.handleStart} disabled={isRunning}>Start</button>
-                <button onClick={this.handleStop} disabled={!isRunning}>Stop</button>
-                <button onClick={this.togglePause} disabled={!isRunning}>{isPaused ? "Wznów" : "Pauzuj"}</button>
-                <p>Liczba przerw: {pausesCount}</p>
+                <ProgressBar 
+                    percent={progressInPercent} 
+                    className={isPaused ? "inactive" : ""} />
+                        <button onClick={this.handleStart} disabled={isRunning}>Start</button>
+                        <button onClick={this.handleStop} disabled={!isRunning}>Stop</button>
+                        <button onClick={this.togglePause} disabled={!isRunning}>{isPaused ? "Wznów" : "Pauzuj"}</button>
+                        <p>Liczba przerw: {pausesCount}</p>
             </div>
         )
     }
@@ -209,14 +204,27 @@ class Timebox extends React.Component {
 class EditableTimebox extends React.Component {
     state = {
         title: "Uczę się wyciągać stan w górę!",
-        totalTimeInMinutes: 20,
+        totalTimeInMinutes: 10,
+    }
+    handleTitleChange = (event) => {
+        this.setState({title: event.target.value})
+    }
+    handleTotalTimeInMinutesChange = (event) => {
+        this.setState({totalTimeInMinutes: event.target.value})
     }
     render() {
-        const { title, totalTimeInMinutes } = this.state
+        const { title, totalTimeInMinutes } = this.state;
         return (
             <>
-                <TimeboxEditor />
-                <Timebox title={title} totalTimeInMinutes={totalTimeInMinutes} totalTime={totalTimeInMinutes * 60}/>
+                <TimeboxEditor
+                    title={title}
+                    totalTimeInMinutes={totalTimeInMinutes}
+                    onTitleChange={this.handleTitleChange}
+                    onTotalTimeInMinutesChange={this.handleTotalTimeInMinutesChange} />
+                <Timebox 
+                    title={title}
+                    totalTimeInMinutes={totalTimeInMinutes}
+                    totalTime={totalTimeInMinutes * 60} />
             </>
         )
     }
