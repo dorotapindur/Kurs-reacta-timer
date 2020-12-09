@@ -185,7 +185,7 @@ class Timebox extends React.Component {
 
     render() {
         const {isRunning, isPaused, pausesCount, elapsedTimeInSeconds} = this.state;
-        const {title, totalTimeInMinutes, totalTime, isEditable, onEdit} = this.props;
+        const {title, totalTime, isEditable, onEdit} = this.props;
         const timeLeftInSeconds = totalTime - elapsedTimeInSeconds;
         const hoursLeft = Math.floor(timeLeftInSeconds/3600);
         const minutesLeft = Math.floor(timeLeftInSeconds/60);
