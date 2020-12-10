@@ -11,17 +11,35 @@
     <style>
         .App {
             font-family: sans-serif;
+            padding: 50px;
         }
         .TimeboxEditor {
+            max-width: 400px;
             text-align: right;
             border: 1px solid grey;
             border-radius: 5px;
             padding: 20px;
+            margin: 0 auto;
             margin-bottom: 20px;
+            position: relative;
+        }
+        .TimeboxEditor::before {
+            width: 60px;
+            height: 60px;
+            content: "";
+            background: url("tomato-icon.png");
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            z-index: -1;
+        }
+        label {
+            font-weight: bold;
         }
         input {
             min-width: 60%;
-            margin-left: 20px;
+            max-width: 90%;
+            margin-left: 5px;
             font-size: 16px;
         }
         button {
@@ -29,10 +47,12 @@
             margin-left: 10px;
         }
         .Timebox {
+            max-width: 400px;
             border: 1px solid grey;
             border-radius: 5px;
             padding: 20px;
             text-align: center;
+            margin: 0 auto;
         }
         .Clock {
             color: orangered;
@@ -57,10 +77,13 @@
             border: 1px solid orangered;
             border-radius: 5px;
             box-sizing: border-box;
-            z-index: -1;
+            z-index: 0;
         }
         .inactive {
             filter: blur(2px) grayscale(1);
+        }
+        h1 {
+            text-align: center;
         }
     </style>
 </head>
