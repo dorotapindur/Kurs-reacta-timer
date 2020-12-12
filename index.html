@@ -183,7 +183,8 @@ class Timebox extends React.Component {
             pausesCount: 0,
             elapsedTimeInSeconds: 0, 
         });
-        this.stopTimer();        
+        this.stopTimer();
+        this.props.onStop();
     }
     togglePause() {
         this.setState(
@@ -218,9 +219,10 @@ class Timebox extends React.Component {
             10
         );
     }
+    
     stopTimer() {
         window.clearInterval(this.intervalId);
-        }
+    }
 
     render() {
         const {isPaused, pausesCount, elapsedTimeInSeconds,isRunning} = this.state;
@@ -239,9 +241,15 @@ class Timebox extends React.Component {
                 <ProgressBar 
                     percent={progressInPercent} 
                     className={isPaused ? "inactive" : ""} />
-                        <button onClick={onEdit} disabled={isEditable}>Edytuj</button>
-                        <button onClick={this.handleStart} disabled={isRunning}>Start</button>
-                        <button onClick={onStop} disabled={!isRunning}>Stop</button>
+                        <button
+                            onClick={onEdit}
+                            disabled={isEditable}>Edytuj</button>
+                        <button
+                            onClick={this.handleStart}
+                            disabled={isRunning}>Start</button>
+                        <button
+                            onClick={this.handleStop}
+                            disabled={!isRunning}>Stop</button>
                         <button onClick={this.togglePause} disabled={!isRunning}>{isPaused ? "Wznów" : "Pauzuj"}</button>
                         <p>Liczba przerw: {pausesCount}</p>
             </div>
@@ -259,6 +267,7 @@ class EditableTimebox extends React.Component {
         isEditable: false,
         isGoing: false,
     }
+   
     handleTitleChange = (event) => {
         this.setState({title: event.target.value})
     }
@@ -275,8 +284,9 @@ class EditableTimebox extends React.Component {
         this.setState({ isGoing: true})
     }
     handleStopRunning = () => {
-        this.setState({ isGoing: false})
+        this.setState({ isGoing: false});
     }
+    
     render() {
         const { title, totalTimeInMinutes, isEditable, isGoing } = this.state;
         return (
