@@ -200,7 +200,9 @@ function Timebox (props) {
                     <button
                         onClick={onStop}
                         disabled={!isRunning}>Stop</button>
-                    <button onClick={onPause} disabled={!isRunning}>{isPaused ? "Wznów" : "Pauzuj"}</button>
+                    <button
+                        onClick={onPause}
+                        disabled={!isRunning}>{isPaused ? "Wznów" : "Pauzuj"}</button>
                     <p>Liczba przerw: {pausesCount}</p>
         </div>
     )
@@ -228,10 +230,12 @@ class EditableTimebox extends React.Component {
         this.setState({totalTimeInMinutes: event.target.value})
     }
     handleConfirm = () => {
-        this.setState({ isEditable: false })
+        this.setState({ isEditable: false });
+        this.startTimer();
     }
     handleEdit = () => {
-        this.setState({ isEditable: true })
+        this.setState({ isEditable: true });
+        this.stopTimer();
     }
     handleStart = ()  => {
         this.setState({ isRunning: true });
@@ -263,7 +267,7 @@ class EditableTimebox extends React.Component {
             }
         )
     }
-
+    
     startTimer() {
         this.intervalId = window.setInterval (
             () => {
