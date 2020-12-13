@@ -115,13 +115,13 @@ function TimeboxEditor(props) {
     return (
         <div className={`TimeboxEditor ${!inactive ? "" : "inactive"}`}>
             <label>Co robisz? <input
-                disabled={!isEditable}
+                disabled={inactive}
                 value={title}
                 onChange={onTitleChange}
                 type="text" />
             </label><br />
             <label>Ile minut? <input 
-                disabled={!isEditable}
+                disabled={inactive}
                 value={totalTimeInMinutes}
                 onChange={onTotalTimeInMinutesChange}
                 type="number" />
@@ -202,7 +202,7 @@ class Timebox extends React.Component {
             }
         )
     }
-    
+
     startTimer() {
         this.intervalId = window.setInterval (
             () => {
@@ -233,7 +233,10 @@ class Timebox extends React.Component {
         const secondsLeft = Math.floor(timeLeftInSeconds%60);
         const progressInPercent = (elapsedTimeInSeconds/totalTime) * 100;
         let inactive = true;
-        isGoing ? inactive = false : inactive = true;
+        if (isGoing) { 
+            isEditable ? inactive = true : inactive = false
+        } else { inactive = true }
+
         return (
             <div className={`Timebox ${inactive ? "inactive" : ""}`}>
                 <h2>{title}</h2>
@@ -284,7 +287,8 @@ class EditableTimebox extends React.Component {
         this.setState({ isGoing: true})
     }
     handleStopRunning = () => {
-        this.setState({ isGoing: false});
+        this.setState({ isGoing: false });
+        this.setState({ isEditable: false })
     }
     
     render() {
