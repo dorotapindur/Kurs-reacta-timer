@@ -199,10 +199,10 @@ function Timebox (props) {
                         disabled={inactive}>Edytuj</button>
                     <button
                         onClick={onStop}
-                        disabled={!isRunning}>Stop</button>
+                        disabled={inactive}>Stop</button>
                     <button
                         onClick={onPause}
-                        disabled={!isRunning}>{isPaused ? "Wznów" : "Pauzuj"}</button>
+                        disabled={inactive}>{isPaused ? "Wznów" : "Pauzuj"}</button>
                     <p>Liczba przerw: {pausesCount}</p>
         </div>
     )
