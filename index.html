@@ -82,11 +82,17 @@
         .inactive {
             filter: blur(2px) grayscale(1);
         }
+        .invisible {
+            display: none;
+        }
         h1 {
             text-align: center;
         }
-        .Orangered {
+        .orangered {
             color: orangered;
+        }
+        .timeisup {
+            background: red;
         }
     </style>
 </head>
@@ -137,19 +143,29 @@ function TimeboxEditor(props) {
                 onClick={onConfirm}
                 disabled={!isEditable}>Zatwierdź zmiany
             </button>
-            <p className={`Orangered ${!isRunning ? "inactive" : ""}` }>running</p>
+            <p className={`orangered ${!isRunning ? "inactive" : ""}` }>running</p>
         </div>
     )
 };
 
-function Clock({className = "", hours = 3, minutes = 7, seconds = 7}) {
-        return (<p className={"Clock " + className}>Pozostało {hours < 24 ?
-         (hours<0 ? hours=`00` : (hours < 10 ? hours=`0${hours}` : hours)) : hours='23'}:{minutes < 60 ?
-         (minutes<0 ? minutes=`00` : (minutes < 10 ? minutes=`0${minutes}` : minutes)) : minutes='59'}:{seconds < 60 ?
-         (seconds<0 ? seconds=`00` : (seconds < 10 ? seconds=`0${seconds}` : seconds)) : seconds='59'}</p>)
+function Clock({className = "", hours = 0, minutes = 0, seconds = 0}) {
+    if (hours < 0) {hours = 0}
+    if (hours > 23) {hours = 23}
+    if (minutes < 0) {minutes = 0}
+    if (minutes > 59) {minutes = 59}
+    if (seconds < 0) {seconds = 0}
+    if (seconds > 59) {seconds = 59}
+    let hoursFormatted = hours.toString().padStart(2, '0');
+    let minutesFormatted = minutes.toString().padStart(2, '0');
+    let secondsFormatted = seconds.toString().padStart(2, '0');
+    return (
+        <div>
+            <p className={"Clock " + className}>Pozostało {hoursFormatted}:{minutesFormatted}:{secondsFormatted}</p>
+        </div>
+        )
     };
 
-function ProgressBar({className = "", percent = 0, trackRemaining = false}) {
+function ProgressBar({className = "", percent = 0, seconds = 0, trackRemaining = false}) {
     if (percent > 100) {percent=100};
     if (percent < 0) {percent=0};
     if (trackRemaining)  
@@ -186,24 +202,28 @@ function Timebox (props) {
     if (isRunning) { 
         isEditable ? inactive = true : inactive = false
     } else { inactive = true }
-
     return (
         <div className={`Timebox ${inactive ? "inactive" : ""}`}>
             <h2>{title}</h2>
-            <Clock hours={hoursLeft} minutes={minutesLeft} seconds={secondsLeft} className={isPaused ? "inactive" : ""}/>
+            <Clock 
+                hours={hoursLeft}
+                minutes={minutesLeft}
+                seconds={secondsLeft}
+                className={isPaused ? "inactive" : ""}/>
             <ProgressBar 
                 percent={progressInPercent} 
-                className={isPaused ? "inactive" : ""} />
-                    <button
-                        onClick={onEdit}
-                        disabled={inactive}>Edytuj</button>
-                    <button
-                        onClick={onStop}
-                        disabled={inactive}>Stop</button>
-                    <button
-                        onClick={onPause}
-                        disabled={inactive}>{isPaused ? "Wznów" : "Pauzuj"}</button>
-                    <p>Liczba przerw: {pausesCount}</p>
+                className={isPaused ? "inactive" : ""}
+                seconds={secondsLeft} />
+            <button
+                onClick={onEdit}
+                disabled={inactive}>Edytuj</button>
+            <button
+                onClick={onStop}
+                disabled={inactive}>Stop/Reset</button>
+            <button
+                onClick={onPause}
+                disabled={inactive}>{isPaused ? "Wznów" : "Pauzuj"}</button>
+            <p>Liczba przerw: {pausesCount}</p>
         </div>
     )
     
@@ -215,7 +235,7 @@ function Timebox (props) {
 class EditableTimebox extends React.Component {
     state = {
         title: "Uczę się wyciągać stan w górę!",
-        totalTimeInMinutes: 10,
+        totalTimeInMinutes: 0,
         isEditable: false,
         isRunning: false,
         isPaused: false,
@@ -235,20 +255,13 @@ class EditableTimebox extends React.Component {
     }
     handleEdit = () => {
         this.setState({ isEditable: true });
-        this.stopTimer();
+        this.pauseTimer();
     }
     handleStart = ()  => {
         this.setState({ isRunning: true });
         this.startTimer();
     }
-    handleStop = () => {
-        this.setState({
-            isRunning: false,
-            isPaused: false,
-            isEditable: false,
-            pausesCount: 0,
-            elapsedTimeInSeconds: 0, 
-        });
+    handleStop = () => {        
         this.stopTimer();
     }
     togglePause = () => {
@@ -256,7 +269,7 @@ class EditableTimebox extends React.Component {
             function(prevState) {
                 const isPaused = !prevState.isPaused;
                 if (isPaused) {
-                    this.stopTimer()
+                    this.pauseTimer()
                 } else {
                     this.startTimer()
                 }
@@ -274,7 +287,7 @@ class EditableTimebox extends React.Component {
                 this.setState(
                     (prevState) => ({elapsedTimeInSeconds: prevState.elapsedTimeInSeconds + 0.01})
                 )
-                if (this.state.elapsedTimeInSeconds > this.props.totalTime) {
+                if (this.state.elapsedTimeInSeconds >= this.state.totalTimeInMinutes * 60) {
                     this.stopTimer();
                     this.setState({
                         isRunning: false,
@@ -284,9 +297,18 @@ class EditableTimebox extends React.Component {
             10
         );
     }
-    
+    pauseTimer() {
+        window.clearInterval(this.intervalId);
+    }
     stopTimer() {
         window.clearInterval(this.intervalId);
+        this.setState({
+            isRunning: false,
+            isPaused: false,
+            isEditable: false,
+            pausesCount: 0,
+            elapsedTimeInSeconds: 0, 
+        });
     }
 
     render() {
