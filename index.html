@@ -4,186 +4,415 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Kurs Reacta - tydzień 1</title>
+    <title>Kurs Reacta - timer</title>
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         .App {
             font-family: sans-serif;
+            padding: 50px;
         }
-        .TimeboxEditor {
+        .Timebox {
+            border: 1px solid grey;
+            border-radius: 5px;
+            padding: 5px;
+            margin: 0 auto 10px;
+        }
+        .TimeboxEditor, .TimeboxCreator {
+            max-width: 400px;
             text-align: right;
             border: 1px solid grey;
             border-radius: 5px;
             padding: 20px;
-            margin-bottom: 20px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        .TimeboxEditor::before {
+            width: 60px;
+            height: 60px;
+            content: "";
+            background: url("tomato-icon.png");
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            z-index: -1;
+        }
+        label {
+            font-weight: bold;
         }
         input {
             min-width: 60%;
-            margin-left: 20px;
+            max-width: 90%;
+            margin: 0 0 14px 5px;
             font-size: 16px;
         }
         button {
             font-size: 16px;
             margin-left: 10px;
         }
-        .Timebox {
+        .CurrentTimebox {
+            max-width: 400px;
             border: 1px solid grey;
             border-radius: 5px;
             padding: 20px;
             text-align: center;
+            margin: 0 auto;
         }
         .Clock {
             color: orangered;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            width: max-content;
         }
         .ProgressBar {
-            border: 1px solid orangered;
-            border-radius: 5px;
+            border-radius: 3px;
             height: 25px;
             margin-bottom: 20px;
-            padding: 5px;
-            padding-left: 20%;
+            padding: 0;
+            background: orangered;
+            background-clip: content-box;
+            position: relative;
         }
-        .ProgressBar > div {
-            height: 100%;
-            background-color: orangered;
-            width: 100%;
+        .ProgressBar:before {
+            content: "";
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: calc(100% + 12px);
+            height: calc(100% + 12px);
+            border: 1px solid orangered;
+            border-radius: 5px;
+            box-sizing: border-box;
+            z-index: 0;
         }
         .inactive {
             filter: blur(2px) grayscale(1);
         }
+        .invisible {
+            display: none;
+        }
+        h1 {
+            text-align: center;
+        }
+        .orangered {
+            color: orangered;
+        }
+        .timeisup {
+            color: white;
+            background: red;
+            background-clip: content-box;
+        }
     </style>
 </head>
 <body>
-    <h1>Kurs Reacta - Tydzień 2</h1>
+    <h1>Kurs Reacta - Tydzień 3</h1>
     <hr>
-    <!--<div class="App">
-        <div class="TimeboxEditor inactive">
-            <label>Co robisz? <input value="Uczę się skrótów klawiszowych" type="text"></label><br>
-            <label>Ile minut? <input value="25" type="number"></label><br>
-            <button disabled>Zacznij</button>
-        </div>
-        <div class="Timebox">
-            <h2>Uczę się skrótów klawiszowych</h2>
-            <p class="Clock">Pozostało 13:28</p>
-            <div class="ProgressBar">
-                <div ></div>
-            </div>
-            <button disabled>Start</button>
-            <button>Stop</button>
-            <button>Pauzuj</button>
-            <p>Liczba przerw: 2</p>
-        </div>
-    </div>-->
-
     <div id="root"></div>
 </body>
 
-<script type="text/javascript">
-    const rootElement = document.getElementById("root");
+<script type="text/babel">
 
-    const app = React.createElement("div", {className: "App"},
-    React.createElement(
-        "div",
-        {className: "TimeboxEditor inactive"},
-            React.createElement(
-                "label",
-                {}, "Co robisz?",
-                React.createElement(
-                "input",
-                {value: "Uczę się", type: "text"})
-            ),
-            React.createElement("br"),
-            React.createElement(
-                "label",
-                {}, "Ile minut?",
-                React.createElement(
-                "input",
-                {value: "25", type: "text"})
-            ),
-            React.createElement(
-                "button",
-                {}, "Zacznij"
-            ),
-        ),
-    React.createElement(
-        "div",
-        {className: "Timebox"},
-        React.createElement(
-            "h2",
-            {}, "Uczę się"
-        ),
-        React.createElement(
-            "p",
-            {className: "Clock"}, "Pozostało 10:10"
-        ),
-        React.createElement(
-            "div",
-            {className: "ProgressBar"},
-            React.createElement("div")
-        ),
-        React.createElement(
-            "button",
-            {}, "Start"
-        ),
-        React.createElement(
-            "button",
-            {}, "Stop"
-        ),
-        React.createElement(
-            "button",
-            {}, "Pauzuj"
-        )
+function TimeboxEditor(props) {
+    const { 
+        title, 
+        totalTimeInMinutes,
+        onTitleChange,
+        onTotalTimeInMinutesChange,
+        onConfirm,
+        isEditable,
+        isRunning,
+        onStart
+    } = props;
+    let inactive = true;
+    if (isRunning == true) {
+        if (isEditable == true) {inactive = false}
+        else {inactive = true}
+    }
+    else {inactive = false}
+    return (
+        <div className={`TimeboxEditor ${!inactive ? "" : "inactive"}`}>
+            <label>Co robisz? <input
+                disabled={inactive}
+                value={title}
+                onChange={onTitleChange}
+                type="text" />
+            </label><br />
+            <label>Ile minut? <input 
+                disabled={inactive}
+                value={totalTimeInMinutes}
+                onChange={onTotalTimeInMinutesChange}
+                type="number" />
+            </label><br />
+            <button
+                onClick={onStart}
+                disabled={isRunning}>Zacznij
+            </button>
+            <button 
+                onClick={onConfirm}
+                disabled={!isEditable}>Zatwierdź zmiany
+            </button>
+            <p className={`orangered ${!isRunning ? "inactive" : ""}` }>running</p>
+        </div>
     )
-);
+};
 
-console.log(app);
-        
-    ReactDOM.render(app, rootElement);
+function Clock({className = "", hours = 0, minutes = 0, seconds = 0, percent = 0, over = false}) {
+    if (hours < 0) {hours = 0}
+    if (hours > 23) {hours = 23}
+    if (minutes < 0) {minutes = 0}
+    if (minutes > 59) {minutes = 59}
+    if (seconds < 0) {seconds = 0}
+    if (seconds > 59) {seconds = 59}
+    let hoursFormatted = hours.toString().padStart(2, '0');
+    let minutesFormatted = minutes.toString().padStart(2, '0');
+    let secondsFormatted = seconds.toString().padStart(2, '0');
+    return (
+        <div>
+            <p className={over ? "Clock timeisup " + className : "Clock " + className}>Pozostało {hoursFormatted}:{minutesFormatted}:{secondsFormatted}</p>
+        </div>
+        )
+    };
 
-    /*const lineBreak = document.createElement("br");
-    const labelTwo = document.createElement("label");
-    labelTwo.textContent = "Ile minut?";
-    const inputTwo = document.createElement("input");
-    inputTwo.value = "25";
-    inputTwo.type="text";
-    const goButton = document.createElement("button");
-    goButton.innerHTML = "Zacznij";*/
-    //rootElement.append(timeboxEditor);
-    //timeboxEditor.append(labelOne, lineBreak, labelTwo, goButton);
-    //labelOne.append(inputOne);
-    //labelTwo.append(inputTwo);
+function ProgressBar({className = "", percent = 0, trackRemaining = false, over = false}) {
+    if (percent > 100) {percent=100};
+    if (percent < 0) {percent=0};   
+    if (trackRemaining)  
+        return (<div className={over ? "ProgressBar timeisup " + className : "ProgressBar " + className} style={{ paddingLeft: `${percent}%` }}></div>)
+        else return (<div className={over ? "ProgressBar timeisup " + className : "ProgressBar " + className} style={{ paddingRight: `${100 - percent}%` }}></div>);
+};
 
-    /*const timebox = document.createElement("div");
-    timebox.className = "Timebox";
-    const header = document.createElement("h2");
-    header.textContent = "Uczę się";
-    const clock = document.createElement("p");
-    clock.className = "Clock";
-    clock.textContent = "Pozostało 09:12";
-    const progressBar = document.createElement("div");
-    progressBar.className = "ProgressBar";
-    const inProgress = document.createElement("div");
-    const startButton = document.createElement("button");
-    startButton.innerHTML = "Start";
-    const stopButton = document.createElement("button");
-    stopButton.innerHTML = "Stop";
-    const pauseButton = document.createElement("button");
-    pauseButton.innerHTML = "Pauzuj";
-    const breaks = document.createElement("p");
-    breaks.innerHTML = "Liczba przerw: 2";
 
-    rootElement.append(timebox);
-    timebox.append(header, clock, progressBar, startButton, stopButton, pauseButton, breaks);
-    progressBar.append(inProgress);
 
-    const element = React.createElement(
-        "h2",
-        { className: "Clock" },
-        "Pozostało 09:21"
-    );
-    console.log(element);
-    ReactDOM.render(element, rootElement);*/
 
+function CurrentTimebox (props) {
+    const {
+        title,
+        totalTimeInMinutes,
+        isEditable,
+        isRunning,
+        isPaused,
+        pausesCount,
+        elapsedTimeInSeconds,
+        onStart,
+        onStop,
+        onEdit,
+        onPause,
+        onTitleChange, 
+        totalTime,
+    } = props
+                    
+    const timeLeftInSeconds = totalTime - elapsedTimeInSeconds;
+    const hoursLeft = Math.floor(timeLeftInSeconds/3600);
+    const minutesLeft = Math.floor(timeLeftInSeconds/60);
+    const secondsLeft = Math.floor(timeLeftInSeconds%60);
+    const progressInPercent = (elapsedTimeInSeconds/totalTime) * 100;
+    let inactive = true;
+    if (isRunning) { 
+        isEditable ? inactive = true : inactive = false
+    } else { inactive = true }
+    let almostOver = false;
+    if (progressInPercent > 90) {almostOver = true};
+    return (
+        <div className={`CurrentTimebox ${inactive ? "inactive" : ""}`}>
+            <h2>{title}</h2>
+            <Clock 
+                hours={hoursLeft}
+                minutes={minutesLeft}
+                seconds={secondsLeft}
+                over={almostOver}
+                className={isPaused ? "inactive" : ""}/>
+            <ProgressBar 
+                percent={progressInPercent} 
+                over={almostOver}
+                className={isPaused ? "inactive" : ""} />
+            <button
+                onClick={onEdit}
+                disabled={inactive}>Edytuj</button>
+            <button
+                onClick={onStop}
+                disabled={inactive}>Stop/Reset</button>
+            <button
+                onClick={onPause}
+                disabled={inactive}>{isPaused ? "Wznów" : "Pauzuj"}</button>
+            <p>Liczba przerw: {pausesCount}</p>
+        </div>
+    )
+    
+};
+
+
+
+class EditableTimebox extends React.Component {
+    state = {
+        title: "Uczę się wyciągać stan w górę!",
+        totalTimeInMinutes: 0,
+        isEditable: false,
+        isRunning: false,
+        isPaused: false,
+        pausesCount: 0,
+        elapsedTimeInSeconds: 0,
+    }
+   
+    handleTitleChange = (event) => {
+        this.setState({title: event.target.value})
+    }
+    handleTotalTimeInMinutesChange = (event) => {
+        this.setState({totalTimeInMinutes: event.target.value})
+    }
+    handleConfirm = () => {
+        this.setState({ isEditable: false });
+        this.startTimer();
+    }
+    handleEdit = () => {
+        this.setState({ isEditable: true });
+        this.pauseTimer();
+    }
+    handleStart = ()  => {
+        this.setState({ isRunning: true });
+        this.startTimer();
+    }
+    handleStop = () => {        
+        this.stopTimer();
+    }
+    togglePause = () => {
+        this.setState(
+            function(prevState) {
+                const isPaused = !prevState.isPaused;
+                if (isPaused) {
+                    this.pauseTimer()
+                } else {
+                    this.startTimer()
+                }
+                return {
+                    isPaused,
+                    pausesCount: isPaused ? prevState.pausesCount + 1 : prevState.pausesCount
+                }
+            }
+        )
+    }
+    
+    startTimer() {
+        this.intervalId = window.setInterval (
+            () => {
+                this.setState(
+                    (prevState) => ({elapsedTimeInSeconds: prevState.elapsedTimeInSeconds + 0.01})
+                )
+                if (this.state.elapsedTimeInSeconds >= this.state.totalTimeInMinutes * 60) {
+                    this.stopTimer();
+                    this.setState({
+                        isRunning: false,
+                    });
+                }
+            },
+            10
+        );
+    }
+    pauseTimer() {
+        window.clearInterval(this.intervalId);
+    }
+    stopTimer() {
+        window.clearInterval(this.intervalId);
+        this.setState({
+            isRunning: false,
+            isPaused: false,
+            isEditable: false,
+            pausesCount: 0,
+            elapsedTimeInSeconds: 0, 
+        });
+    }
+
+    render() {
+        const { title, totalTimeInMinutes, isEditable, isRunning, isPaused, pausesCount, elapsedTimeInSeconds } = this.state;
+        const totalTime = totalTimeInMinutes * 60;
+        return (
+            <>
+                <TimeboxEditor
+                    title={title}
+                    totalTimeInMinutes={totalTimeInMinutes}
+                    totalTime={totalTime}
+                    onTitleChange={this.handleTitleChange}
+                    onTotalTimeInMinutesChange={this.handleTotalTimeInMinutesChange}
+                    isEditable={isEditable}
+                    isRunning={isRunning}
+                    isPaused={isPaused}
+                    onStart={this.handleStart}
+                    onConfirm={this.handleConfirm}
+                    onPause={this.togglePause} />
+                <CurrentTimebox 
+                    title={title}
+                    totalTimeInMinutes={totalTimeInMinutes}
+                    totalTime={totalTimeInMinutes * 60}
+                    isEditable={isEditable}
+                    isRunning={isRunning}
+                    isPaused={isPaused}
+                    pausesCount={pausesCount}
+                    elapsedTimeInSeconds={elapsedTimeInSeconds}
+                    onStart={this.handleStart}
+                    onStop={this.handleStop}
+                    onEdit={this.handleEdit}
+                    onPause={this.togglePause} />
+            </>
+        )
+    }
+}
+
+function TimeboxCreator(props) {
+   
+   return (
+       <div className={"TimeboxCreator"}>
+           <label>Co robisz? <input
+               type="text" />
+           </label><br />
+           <label>Ile minut? <input 
+               type="number" />
+           </label><br />
+           <button
+           >Dodaj timebox
+           </button>
+       </div>
+   )
+};
+
+class TimeboxList extends React.Component {
+    state = {
+        timeboxes: [
+            { title: "Uczę się list", totalTimeInMinutes: 25},
+            { title: "Uczę się formularzy", totalTimeInMinutes: 15},
+            { title: "Uczę się komponentów niekontrolowanych", totalTimeInMinutes: 5},
+        ]
+    }
+    render() {
+        return (
+            <>
+                <TimeboxCreator />
+                {this.state.timeboxes.map(timebox => (
+                    <Timebox title={timebox.title} totalTimeInMinutes={timebox.totalTimeInMinutes} />
+                ))}               
+            </>
+        )
+    }
+
+}
+
+function Timebox({ title, totalTimeInMinutes }) {
+    return (
+        <div className="Timebox">
+            <h3>{title} - {totalTimeInMinutes} min.</h3>
+        </div>
+    )
+}
+
+function App() {
+    return (
+        <div className="App">
+            <TimeboxList />
+        </div>
+    )
+}
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+    
 </script>
+
 </html>
