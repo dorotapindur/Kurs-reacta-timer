@@ -46,7 +46,7 @@
             font-size: 16px;
             margin-left: 10px;
         }
-        .Timebox {
+        .CurrentTimebox {
             max-width: 400px;
             border: 1px solid grey;
             border-radius: 5px;
@@ -180,7 +180,7 @@ function ProgressBar({className = "", percent = 0, trackRemaining = false, over 
 
 
 
-function Timebox (props) {
+function CurrentTimebox (props) {
     const {
         title,
         totalTimeInMinutes,
@@ -209,7 +209,7 @@ function Timebox (props) {
     let almostOver = false;
     if (progressInPercent > 90) {almostOver = true};
     return (
-        <div className={`Timebox ${inactive ? "inactive" : ""}`}>
+        <div className={`CurrentTimebox ${inactive ? "inactive" : ""}`}>
             <h2>{title}</h2>
             <Clock 
                 hours={hoursLeft}
@@ -335,7 +335,7 @@ class EditableTimebox extends React.Component {
                     onStart={this.handleStart}
                     onConfirm={this.handleConfirm}
                     onPause={this.togglePause} />
-                <Timebox 
+                <CurrentTimebox 
                     title={title}
                     totalTimeInMinutes={totalTimeInMinutes}
                     totalTime={totalTimeInMinutes * 60}
