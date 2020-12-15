@@ -57,13 +57,15 @@
         .Clock {
             color: orangered;
             font-weight: bold;
+            margin: 0 auto 20px;
+            width: max-content;
         }
         .ProgressBar {
             border-radius: 3px;
             height: 25px;
             margin-bottom: 20px;
             padding: 0;
-            background: rgb(255, 68, 0);
+            background: orangered;
             background-clip: content-box;
             position: relative;
         }
@@ -92,7 +94,9 @@
             color: orangered;
         }
         .timeisup {
+            color: white;
             background: red;
+            background-clip: content-box;
         }
     </style>
 </head>
@@ -148,7 +152,7 @@ function TimeboxEditor(props) {
     )
 };
 
-function Clock({className = "", hours = 0, minutes = 0, seconds = 0}) {
+function Clock({className = "", hours = 0, minutes = 0, seconds = 0, percent = 0, over = false}) {
     if (hours < 0) {hours = 0}
     if (hours > 23) {hours = 23}
     if (minutes < 0) {minutes = 0}
@@ -160,17 +164,17 @@ function Clock({className = "", hours = 0, minutes = 0, seconds = 0}) {
     let secondsFormatted = seconds.toString().padStart(2, '0');
     return (
         <div>
-            <p className={"Clock " + className}>Pozostało {hoursFormatted}:{minutesFormatted}:{secondsFormatted}</p>
+            <p className={over ? "Clock timeisup " + className : "Clock " + className}>Pozostało {hoursFormatted}:{minutesFormatted}:{secondsFormatted}</p>
         </div>
         )
     };
 
-function ProgressBar({className = "", percent = 0, seconds = 0, trackRemaining = false}) {
+function ProgressBar({className = "", percent = 0, trackRemaining = false, over = false}) {
     if (percent > 100) {percent=100};
-    if (percent < 0) {percent=0};
+    if (percent < 0) {percent=0};   
     if (trackRemaining)  
-        return (<div className={"ProgressBar " + className} style={{ paddingLeft: `${percent}%` }}></div>)
-        else return (<div className={"ProgressBar " + className} style={{ paddingRight: `${100 - percent}%` }}></div>);
+        return (<div className={over ? "ProgressBar timeisup " + className : "ProgressBar " + className} style={{ paddingLeft: `${percent}%` }}></div>)
+        else return (<div className={over ? "ProgressBar timeisup " + className : "ProgressBar " + className} style={{ paddingRight: `${100 - percent}%` }}></div>);
 };
 
 
@@ -202,6 +206,8 @@ function Timebox (props) {
     if (isRunning) { 
         isEditable ? inactive = true : inactive = false
     } else { inactive = true }
+    let almostOver = false;
+    if (progressInPercent > 90) {almostOver = true};
     return (
         <div className={`Timebox ${inactive ? "inactive" : ""}`}>
             <h2>{title}</h2>
@@ -209,11 +215,12 @@ function Timebox (props) {
                 hours={hoursLeft}
                 minutes={minutesLeft}
                 seconds={secondsLeft}
+                over={almostOver}
                 className={isPaused ? "inactive" : ""}/>
             <ProgressBar 
                 percent={progressInPercent} 
-                className={isPaused ? "inactive" : ""}
-                seconds={secondsLeft} />
+                over={almostOver}
+                className={isPaused ? "inactive" : ""} />
             <button
                 onClick={onEdit}
                 disabled={inactive}>Edytuj</button>
