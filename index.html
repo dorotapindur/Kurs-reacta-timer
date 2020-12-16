@@ -386,8 +386,13 @@ class TimeboxList extends React.Component {
         return (
             <>
                 <TimeboxCreator />
-                {this.state.timeboxes.map(timebox => (
-                    <Timebox title={timebox.title} totalTimeInMinutes={timebox.totalTimeInMinutes} />
+                {this.state.timeboxes.map((timebox, index) => (
+                    <Timebox
+                        key={index}
+                        title={timebox.title}
+                        totalTimeInMinutes={timebox.totalTimeInMinutes}
+                        onDelete={() => console.log("Usuwam timebox: ", index)}
+                        onEdit={() => console.log("Zmieniam timebox: ", index)} />
                 ))}               
             </>
         )
@@ -395,10 +400,12 @@ class TimeboxList extends React.Component {
 
 }
 
-function Timebox({ title, totalTimeInMinutes }) {
+function Timebox({ title, totalTimeInMinutes, onDelete, onEdit }) {
     return (
         <div className="Timebox">
             <h3>{title} - {totalTimeInMinutes} min.</h3>
+            <button onClick={onDelete}> Usuń </button>
+            <button onClick={onEdit}> Zmień </button>
         </div>
     )
 }
