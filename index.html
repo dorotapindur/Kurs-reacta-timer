@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/node-uuid/1.4.8/uuid.min.js" integrity="sha512-rV0Q1QWodkoLjts/qP2XHtjvUPTmN46k4eH0lzOR3mDui8a0YnL/uqydipXA9mQ2wG6J4imL0BO6/26rcFho7Q==" crossorigin="anonymous"></script>
     <style>
         .App {
             font-family: sans-serif;
@@ -377,9 +378,9 @@ function TimeboxCreator({onCreate}) {
 class TimeboxList extends React.Component {
     state = {
         timeboxes: [
-            { title: "Uczę się list", totalTimeInMinutes: 25},
-            { title: "Uczę się formularzy", totalTimeInMinutes: 15},
-            { title: "Uczę się komponentów niekontrolowanych", totalTimeInMinutes: 5},
+            { id: "a", title: "Uczę się list", totalTimeInMinutes: 25},
+            { id: "b", title: "Uczę się formularzy", totalTimeInMinutes: 15},
+            { id: "c", title: "Uczę się komponentów niekontrolowanych", totalTimeInMinutes: 5},
         ]
     }
 
@@ -403,7 +404,7 @@ class TimeboxList extends React.Component {
     }
 
     handleCreate = () => {
-        this.addTimebox({ title: "Nowy timebox", totalTimeInMinutes: 6 });
+        this.addTimebox({ id: uuid.v4(), title: "Nowy timebox", totalTimeInMinutes: 6 });
     }
 
     render() {
@@ -412,7 +413,7 @@ class TimeboxList extends React.Component {
                 <TimeboxCreator onCreate={this.handleCreate} />
                 {this.state.timeboxes.map((timebox, index) => (
                     <Timebox
-                        key={index}
+                        key={timebox.id}
                         title={timebox.title}
                         totalTimeInMinutes={timebox.totalTimeInMinutes}
                         onDelete={() => this.removeTimebox(index)}
@@ -430,6 +431,7 @@ function Timebox({ title, totalTimeInMinutes, onDelete, onEdit }) {
             <h3>{title} - {totalTimeInMinutes} min.</h3>
             <button onClick={onDelete}> Usuń </button>
             <button onClick={onEdit}> Zmień </button>
+            <input />
         </div>
     )
 }
