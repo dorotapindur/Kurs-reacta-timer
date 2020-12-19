@@ -367,8 +367,8 @@ class TimeboxCreator extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        this.props.onCreate({
-            id: uuid.v4(),
+        this.props.onSave({
+            id: (this.props.timeboxEdited) ? this.props.timeboxEdited.id : uuid.v4(),
             title: this.titleInput.current.value,
             totalTimeInMinutes: this.totalTimeInMinutesInput.current.value,
         });
@@ -377,7 +377,15 @@ class TimeboxCreator extends React.Component {
     }
 
     render() {
-   
+        const {isEditable, timeboxEdited} = this.props;
+        if (timeboxEdited) {
+            if (this.titleInput.current) {
+                this.titleInput.current.value = timeboxEdited.title;
+            }
+            if (this.totalTimeInMinutesInput.current) {
+                this.totalTimeInMinutesInput.current.value = timeboxEdited.totalTimeInMinutes;
+            }
+        }
         return (
             <form onSubmit={this.handleSubmit} className={"TimeboxCreator"}>
                 <label>Co robisz?
@@ -390,8 +398,11 @@ class TimeboxCreator extends React.Component {
                         ref={this.totalTimeInMinutesInput}
                         type="number" />
                 </label><br />
-                <button
+                <button disabled={isEditable}
                 >Dodaj timebox
+                </button>
+                <button disabled={!isEditable}
+                >Zapisz zmiany
                 </button>
             </form>
         )
@@ -404,7 +415,9 @@ class TimeboxList extends React.Component {
             { id: "a", title: "Uczę się list", totalTimeInMinutes: 25},
             { id: "b", title: "Uczę się formularzy", totalTimeInMinutes: 15},
             { id: "c", title: "Uczę się komponentów niekontrolowanych", totalTimeInMinutes: 5},
-        ]
+        ],
+        isEditable: false,
+        timeboxEdited: null/*none in that moment*/
     }
 
     addTimebox = (timebox) => {
@@ -426,21 +439,34 @@ class TimeboxList extends React.Component {
         })
     }
 
-    handleCreate = (createdTimebox) => {
-        this.addTimebox(createdTimebox);
+    handleEdit = (selectedTimebox) => {
+        this.setState({ isEditable: true, timeboxEdited: selectedTimebox});
+    }
+    handleSave = (modifiedTimebox) => {
+        const timeboxIndex = this.state.timeboxes.findIndex(timebox => timebox.id === modifiedTimebox.id);
+        this.setState({ isEditable: false, timeboxEdited: null });
+        if (timeboxIndex != -1) {
+            this.updateTimebox(timeboxIndex, modifiedTimebox);
+            return;
+        }
+        this.addTimebox(modifiedTimebox);
     }
 
     render() {
+        const { isEditable, timeboxEdited } = this.state;
         return (
             <>
-                <TimeboxCreator onCreate={this.handleCreate} />
+                <TimeboxCreator
+                    onSave={this.handleSave}
+                    isEditable={isEditable}
+                    timeboxEdited={timeboxEdited} />
                 {this.state.timeboxes.map((timebox, index) => (
                     <Timebox
                         key={timebox.id}
                         title={timebox.title}
                         totalTimeInMinutes={timebox.totalTimeInMinutes}
                         onDelete={() => this.removeTimebox(index)}
-                        onEdit={() => this.updateTimebox(index, {...timebox, title: "Updated timebox"})} />
+                        onEdit={() => this.handleEdit(timebox)} />
                 ))}               
             </>
         )
@@ -454,7 +480,6 @@ function Timebox({ title, totalTimeInMinutes, onDelete, onEdit }) {
             <h3>{title} - {totalTimeInMinutes} min.</h3>
             <button onClick={onDelete}> Usuń </button>
             <button onClick={onEdit}> Zmień </button>
-            <input />
         </div>
     )
 }
