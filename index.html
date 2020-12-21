@@ -19,6 +19,7 @@
             border-radius: 5px;
             padding: 5px;
             margin: 0 auto 10px;
+            background-color: greenyellow;
         }
         .TimeboxEditor, .TimeboxCreator {
             max-width: 400px;
@@ -30,6 +31,12 @@
             margin-bottom: 20px;
             position: relative;
         }
+        .TimeboxCreator {
+            background-color: aqua;
+        }
+        .TimeboxEditor {
+            background-color: aquamarine;
+        }
         .TimeboxEditor::before {
             width: 60px;
             height: 60px;
@@ -39,6 +46,9 @@
             bottom: 0px;
             left: 0px;
             z-index: -1;
+        }
+        .CurrentTimebox {
+            background-color: #ffffaa;
         }
         label {
             font-weight: bold;
@@ -490,6 +500,7 @@ function App() {
     return (
         <div className="App">
             <TimeboxList />
+            <EditableTimebox />
         </div>
     )
 }
